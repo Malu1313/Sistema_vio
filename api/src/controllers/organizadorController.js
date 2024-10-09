@@ -1,3 +1,4 @@
+const connect = require("../db/connect");
 let organizadores = [];
 let id_organizadores = 0;
 module.exports = class organizadorController {
@@ -21,19 +22,31 @@ module.exports = class organizadorController {
       return res.status(400).json({ error: "Email inválido. Deve conter @" });
     }
 
-    // Verifica se já existe um usuário com o mesmo Email
-    const existingOrganizador = organizadores.find((organizador) => organizador.email === email);
-    if (existingOrganizador) {
-      return res.status(400).json({ error: "Email já cadastrado" });
+    else {
+      const query = `INSERT INTO organizador (nome, email, senha, telefone) VALUES('${nome}','${email}','${senha}','${telefone}')`;
+      try {
+        connect.query(query, function (err) {
+          if (err) {
+            if (err.code === "ER_DUP_ENTRY") {
+              return res.status(400).json({
+                error: "O email já esta vinculado a outro orgaizador",
+              });
+            } else {
+              return res.status(400).json({
+                error: "Erro interno do servidor",
+              });
+            }
+          } else {
+            return res
+              .status(201)
+              .json({ message: "Organizador criado com sucesso" });
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Erro interno do servidor" });
+      }
     }
-
-    // Cria e adiciona novo usuário
-    const newOrganizador = { id: id_organizadores++, nome, email, senha, telefone };
-    organizadores.push(newOrganizador);
-
-    return res
-      .status(201)
-      .json({ message: "Organizador criado com sucesso", organizadores: newOrganizador }); //201 significa cadastrado
   }
 
   static async getAllOrganizadores(req, res) {
