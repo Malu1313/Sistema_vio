@@ -8,7 +8,7 @@
 /* Define estilos gerais para o corpo da página */
 body {
   font-family: Arial, sans-serif; /* Define a fonte principal */
-  background-color: #f4f4f9; /* Define uma cor de fundo suave */
+  background-color: #ffe1e9; /* Define uma cor de fundo suave */
   color: #333; /* Define a cor padrão do texto */
   min-height: 100vh; /* Garante que o body ocupe toda a altura da tela */
   position: relative; /* Define o contexto de posicionamento relativo para o rodapé */
@@ -17,7 +17,7 @@ body {
 
 /* Estilo do cabeçalho */
 header {
-  background-color: #4caf50; /* Define a cor de fundo do cabeçalho */
+  background-color: #e84c85; /* Define a cor de fundo do cabeçalho */
   padding: 20px; /* Espaçamento interno */
   text-align: center; /* Centraliza o texto */
   color: white; /* Define a cor do texto no cabeçalho */
@@ -51,19 +51,19 @@ nav ul {
 }
 
 /* Estilo de cada item da lista de navegação */
-nav ul li {
+nav ul li2 {
   margin: 0 15px; /* Espaçamento horizontal entre os itens */
 }
 
 /* Estilo dos links de navegação */
-nav ul li a {
+nav ul li2 a {
   color: white; /* Cor do texto dos links */
   text-decoration: none; /* Remove o sublinhado dos links */
   font-weight: bold; /* Texto em negrito */
 }
 
 /* Estilo ao passar o mouse sobre os links */
-nav ul li a:hover {
+nav ul li2 a:hover {
   text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
 }
 
@@ -79,7 +79,7 @@ main section {
 
 /* Seletor de ID para a seção 'home' */
 #home {
-  background-color: #afd8de; /* Cor de fundo para destacar a seção 'home' */
+  background-color: #ff97c6; /* Cor de fundo para destacar a seção 'home' */
   padding: 20px; /* Espaçamento interno */
   border-radius: 8px; /* Bordas arredondadas */
   text-align: center; /* Centraliza o texto */
@@ -87,7 +87,7 @@ main section {
 
 /* Estilo específico para o título dentro da seção 'home' */
 #home h2 {
-  color: #00796b; /* Cor específica para o título da seção 'home' */
+  color: #eff7f6; /* Cor específica para o título da seção 'home' */
 }
 
 /* Estilo do contêiner que agrupa os eventos */
@@ -106,11 +106,25 @@ main section {
 
 /* Estilo do rodapé */
 footer {
-  background-color: #333; /* Cor de fundo escura */
+  background-color: #df4c83; /* Cor de fundo escura */
   color: white; /* Cor do texto do rodapé */
   text-align: center; /* Centraliza o texto */
   padding: 20px 0; /* Espaçamento interno no topo e na base */
   width: 100%; /* Faz com que o rodapé ocupe toda a largura */
   position: absolute; /* Posiciona o rodapé de forma absoluta */
   bottom: 0; /* Posiciona o rodapé na parte inferior da página */
+}
+
+li{
+  background-color: #fc83b0; /* Cor de fundo escura */
+  border: 1px solid #faf7f8;
+  color: #fff; /* Cor do texto do rodapé */
+  text-align: center; /* Centraliza o texto */
+  padding: 20px 0; /* Espaçamento interno no topo e na base */
+  width: 50%; /* Faz com que o rodapé ocupe toda a largura */
+  display: flex;
+  justify-content: center;
+  height: 50px;
+  gap: 20px; /* Espaçamento entre os itens */
+  margin: 0;
 }
