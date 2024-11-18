@@ -142,7 +142,7 @@ li{
 
 /* Estilo para o título da seção de usuários */
 section h2 {
-  color: #00796b; /* Cor específica para o título */
+  color: #fc83b0;; /* Cor específica para o título */
   margin-bottom: 15px; /* Espaçamento inferior */
 }
 
@@ -177,7 +177,7 @@ th, td {
 }
 
 th {
-  background-color: #4caf50; /* Cor de fundo para cabeçalho */
+  background-color: #fc83b0;; /* Cor de fundo para cabeçalho */
   color: white; /* Cor do texto no cabeçalho */
 }
 

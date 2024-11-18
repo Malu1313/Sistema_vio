@@ -25,7 +25,7 @@ module.exports = class organizadorController {
           if (err) {
             if (err.code === "ER_DUP_ENTRY") {
               return res.status(400).json({
-                error: "O email já esta vinculado a outro orgaizador",
+                error: "O email já esta vinculado a outro organizador",
               });
             } else {
               return res.status(400).json({
@@ -44,23 +44,20 @@ module.exports = class organizadorController {
       }
     }
   }
-
-  static async getAllOrganizadores(req, res) {
+  static async getAllOrganizador(req, res) {
     const query = `SELECT * FROM organizador`;
-
     try {
       connect.query(query, function (err, results) {
         if (err) {
           console.error(err);
           return res.status(500).json({ error: "Erro interno do Servidor" });
         }
-
         return res
           .status(200)
           .json({ message: "Lista de organizadores", organizador: results });
       });
     } catch (error) {
-      console.error("Erro ao executar a consulta:", error);
+      console.error("Erro ao executar consulta:", error);
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
@@ -78,35 +75,33 @@ module.exports = class organizadorController {
     const query = `UPDATE organizador SET nome=?,email=?,senha=?,telefone=? WHERE id_organizador = ?`;
     const values = [nome, email, senha, telefone, id];
 
-    try{
-      connect.query(query,values,function(err,results){
-        if(err){
-          if(err.code === "ER_DUP_ENTRY"){
-            return res.status(400).json({error:"Email já cadastrado por outro organizador"});
-          }else{
+    try {
+      connect.query(query, values, function (err, results) {
+        if (err) {
+          if (err.code === "ER_DUP_ENTRY") {
+            return res
+              .status(400)
+              .json({ error: "Email já cadastrado por outro organizador" });
+          } else {
             console.error(err);
-            return res.status(500).json({error:"Erro interno do servidor"});
+            return res.status(500).json({ error: "Erro interno do servidor" });
           }
         }
-        if(results.affectedRows === 0){
-          return res.status(404).json({error:"Organizador não encontrado"});
+        if (results.affectedRows === 0) {
+          return res.status(404).json({ error: "Organizador não encontrado" });
         }
-        return res.status(200).json({message:"Organizador atualizado com sucesso"});
-        
-
-      })
-      
-  }
-    catch(error){
-      console.error("Erro ao executar consulta",error);
-      return res.status(500).json({error: "Erro interno no servidor"});
-
+        return res
+          .status(200)
+          .json({ menssage: "Organizador atualizado com sucesso" });
+      });
+    } catch {
+      console.error("Erro ao executar consulta", error);
+      return res.status(500).json({ error: "Erro interno do servidor" });
     }
-
   }
   static async deleteOrganizador(req, res) {
     const organizadorId = req.params.id;
-    const query = `DELETE FROM organizador WHERE id_organizador = ?`;
+    const query = "DELETE FROM organizador WHERE id_organizador = ?";
     const values = [organizadorId];
 
     try {
@@ -119,15 +114,14 @@ module.exports = class organizadorController {
         if (results.affectedRows === 0) {
           return res.status(404).json({ error: "Organizador não encontrado" });
         }
-
         return res
           .status(200)
-          .json({ message: "Organizador exluido com sucesso" });
+          .json({ menssage: "Organizador deletado com sucesso" });
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json
-        ({error:"Erro interno do servidor"})
+      return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
+  
 };
