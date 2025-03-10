@@ -1,51 +1,41 @@
-let users = [];
-let cpf_user = 0;
 const connect = require("../db/connect");
+const validateUser = require("../services/validateUser");
+const validateCpf = require("../services/validateCpf");
 module.exports = class userController {
   static async createUser(req, res) {
     const { cpf, email, password, name, data_nascimento } = req.body;
+    const validation = validateUser(req.body);
+    if (validation) {
+      return res.status(400).json(validation);
+    }
+    const cpfdValidation = await validateCpf(cpf, id);
+    if (cpfdValidation) {
+      return res.status(400).json(cpfdValidation);
+    }
 
-    if (!cpf || !email || !password || !name || !data_nascimento) {
-      //Verifica se todos os campos estão preenchidos
-      return res
-        .status(400)
-        .json({ error: "Todos os campos devem ser preenchidos" });
-    } else if (isNaN(cpf) || cpf.length !== 11) {
-      //Verifica se tem só números e se tem 11 dígitos
-      return res.status(400).json({
-        error: "CPF inválido. Deve conter exatamente 11 dígitos numéricos",
-      });
-    } else if (!email.includes("@")) {
-      //Verifica se o email tem o @
-      return res.status(400).json({ error: "Email inválido. Deve conter @" });
-    } else {
-      // Construção da query INSERT
-      const query = `INSERT INTO usuario (cpf, password, email, name, data_nascimento) VALUES('${cpf}', '${password}', '${email}', '${name}', '${data_nascimento}')`;
-      // Executando a query criada
-      try {
-        connect.query(query, function (err) {
-          if (err) {
-            console.log(err);
-            console.log(err.code);
-            if (err.code === "ER_DUP_ENTRY") {
-              return res
-                .status(400)
-                .json({ error: "O Email já está vinculado a outro usuário" });
-            } else {
-              return res
-                .status(500)
-                .json({ error: "Erro interno do servidor" });
-            }
-          } else {
+    const query = `INSERT INTO usuario (cpf, password, email, name, data_nascimento) VALUES('${cpf}', '${password}', '${email}', '${name}', '${data_nascimento}')`;
+    // Executando a query criada
+    try {
+      connect.query(query, function (err) {
+        if (err) {
+          console.log(err);
+          console.log(err.code);
+          if (err.code === "ER_DUP_ENTRY") {
             return res
-              .status(201)
-              .json({ message: "Usuário criado com sucesso" });
+              .status(400)
+              .json({ error: "O Email já está vinculado a outro usuário" });
+          } else {
+            return res.status(500).json({ error: "Erro interno do servidor" });
           }
-        });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Erro interno do servidor" });
-      }
+        } else {
+          return res
+            .status(201)
+            .json({ message: "Usuário criado com sucesso" });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
 
@@ -71,13 +61,15 @@ module.exports = class userController {
   static async updateUser(req, res) {
     // Desestrutura e recupera os dados enviados via corpo da requisição
     const { id, name, email, password, cpf, data_nascimento } = req.body;
-
-    // Validar se todos os campos foram preenchidos
-    if (!name || !email || !password || !cpf || !data_nascimento) {
-      return res
-        .status(400)
-        .json({ error: "Todos os campos devem ser preenchidos" });
+    const validation = validateUser(req.body);
+    if (validation) {
+      return res.status(400).json(validation);
     }
+    const cpfdValidation = await validateCpf(cpf, id);
+    if (cpfdValidation) {
+      return res.status(400).json(cpfdValidation);
+    }
+
     const query = `UPDATE usuario SET name=?,email=?,password=?, cpf=? WHERE id_usuario = ?`;
     const values = [name, email, password, cpf, data_nascimento, id];
 
@@ -132,35 +124,35 @@ module.exports = class userController {
       return res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
-  static async loginUser (req, res){
-      const {email, password} = req.body
+  static async loginUser(req, res) {
+    const { email, password } = req.body;
 
-      if(!email || !password){
-        return res.status(400).json({error:"Email e senha são obrigatórios"})
-      }
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email e senha são obrigatórios" });
+    }
 
-      const query = `SELECT * FROM usuario WHERE email = ?`
+    const query = `SELECT * FROM usuario WHERE email = ?`;
 
-      try{
-        connect.query(query,[email],(err, results)=>{
-          if (err){
+    try {
+      connect.query(query, [email], (err, results) => {
+        if (err) {
           console.log(error);
-            return res.status(500).json({error:"Erro interno do servidor"})
-          }
-          if(results.length===0){
-            return res.status(404).json({error:"Usuário não encontrado"})
-          }
-          const user = results[0];
+          return res.status(500).json({ error: "Erro interno do servidor" });
+        }
+        if (results.length === 0) {
+          return res.status(404).json({ error: "Usuário não encontrado" });
+        }
+        const user = results[0];
 
-          if(user.password != password){
-            return res.status(403).json({error:"Senha incorreta"})
-          }
+        if (user.password != password) {
+          return res.status(403).json({ error: "Senha incorreta" });
+        }
 
-          return res.status(200).json({message:"Login bem sucedido", user})
-        })
-      }catch (error) {
-        console.log(error);
-        return res.status(500).json({error:"Erro interno do servidor"})
-      }
+        return res.status(200).json({ message: "Login bem sucedido", user });
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Erro interno do servidor" });
+    }
   }
 };
