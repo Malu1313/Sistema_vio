@@ -52,7 +52,7 @@ create table log_evento(
 delimiter $$
 create function registrar_log_evento(texto varchar(255))
 returns varchar(50)
-not deterministic
+deterministic
 modifies sql data 
 begin
     insert into log_evento(mensagem)
@@ -81,3 +81,154 @@ begin
     return msg;
 end; $$
 delimiter ;
+
+select routine_name from
+information_schema.routines
+    where routine_type = 'FUNCTION'
+        and routine_schema = 'vio_malu';
+
+--maior idade
+delimiter $$
+
+create function is_maior_idade(data_nascimento date)
+returns boolean
+not deterministic
+contains sql
+begin
+    declare idade int;
+
+-- utilizando a função ja criadas
+    set idade = calcula_idade(data_nascimento);
+    return idade >= 18;
+end; $$
+
+delimiter ;
+
+-- categorizar usuarios por faixa etaria
+
+delimiter $$
+
+create function faixa_etaria(data_nascimento date)
+returns varchar(20)
+not deterministic
+contains sql
+begin
+    declare idade int;
+
+    -- calculo da idade com a função ja criada
+    set idade = calcula_idade(data_nascimento);
+
+    if idade < 18 then
+        return "menor de idade";
+    elseif idade < 60 then
+        return "adulto";
+    else
+        return "idoso";
+    end if ;
+end ; $$
+delimiter ;
+
+-- agrupar usuarios por faixa etaria
+select faixa_etaria(data_nascimento) as faixa, count(*) as quantidade from usuario
+group by faixa;
+
+-- identificar uma faixa etaria especifica
+select name from usuario
+    where faixa_etaria(data_nascimento) = "adulto";
+
+-- calcular a media de idade de usuario
+delimiter $$
+create function media_idade()
+returns decimal(5,2)
+not deterministic
+reads sql data
+begin
+    declare media decimal(5,2);
+
+    -- calculo da media das idades
+    select avg(timestampdiff(year, data_nascimento, curdate())) into media from usuario;
+
+    return ifnull(media, 0);
+end; $$
+delimiter ;
+
+-- selecionar idade especifica
+select "A media de idade dos clientes é maior que 30" as resultado where media_idade() > 30;
+
+-- exercicio direcionado
+-- calculo do total gasto por um usuario
+delimiter $$
+create function calcular_total_gasto(pid_usuario int)
+returns decimal(10,2)
+not deterministic
+reads sql data
+begin
+    declare total decimal(10,2);
+    select sum(i.preco * ic.quantidade) into total
+    from compra
+    join ingresso_compra ic on c.id_compra = ic.fk_id_compra
+    join ingresso i on i.id_ingresso = ic.fk_id_ingresso
+    where c.fk_id_usuario = pid_usuario;
+return ifnull (total,0);
+end; $$
+delimiter ;
+
+-- buscar a faixa etaria de um usuario
+delimiter $$
+create function buscar_faixa_etaria_usuario(pid int)
+returns varchar(20)
+not deterministic
+reads sql data
+begin
+    declare nascimento date;
+    declare faixa varchar(20);
+
+    select data_nascimento into nascimento
+    from usuario 
+    where id_usuario = pid;
+
+    set faixa = faixa_etaria(nascimento);
+
+    return false;
+end; $$
+delimiter ;
+
+
+-- exercicio 1 funçao
+delimiter $$
+create function total_ingressos_vendidos(id_evento int) 
+returns int
+deterministic
+begin
+    declare total_vendido int;
+
+    select SUM(ic.quantidade)
+    into total_vendido
+    from ingresso_compra ic
+    join ingresso i on ic.fk_id_ingresso = i.id_ingresso
+    where i.fk_id_evento = id_evento;
+
+    return ifnull(total_vendido, 0); 
+end; $$
+delimiter ;
+
+-- exercicio 2 funçao
+delimiter $$
+create function renda_total_evento(id_evento INT) 
+returns decimal(10,2)
+not deterministic
+begin
+    declare total_renda decimal(10,2);
+
+    select sum(i.preco * ic.quantidade)
+    into total_renda
+    from ingresso_compra ic
+    join ingresso i ON ic.fk_id_ingresso = i.id_ingresso
+    where i.fk_id_evento = id_evento;
+
+    return ifnull(total_renda, 0);  
+end; $$
+delimiter ;
+
+
+
